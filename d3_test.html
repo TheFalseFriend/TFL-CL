@@ -5,6 +5,21 @@
 		<meta charset="utf-8">
 
 		<style>
+
+			/* GENERAL STYLES FOR PAGE */
+			#pageTitle {
+				font: 40px sans-serif;
+				text-align: center;
+			}
+
+			.sectionHeading {
+				font: 20px sans-serif;
+				text-align: left;
+			}
+			/*****************************/
+
+
+			/* STYLES FOR BAR CHART STUFF */
 			.chartNoSVG div {
 				font: 10px sans-serif;
 				background-color: steelblue;
@@ -23,21 +38,48 @@
 				font: 10px sans-serif;
 				text-anchor: end;
 			}
+			/*****************************/
+			
+			/* STYLES FOR FORCE LAYOUT STUFF */
+			.node {
+				fill: #ccc;
+				stroke: #fff;
+				stroke-width: 2px;
+			}
 
+			.link {
+				stroke: #777;
+			    stroke-width: 2px;
+			}
+			/*****************************/
 			
 
 		</style>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 	</head>
 	<body>
-		Without SVG:<br>
-		<div class="chartNoSVG"></div>
+		<h1 id="pageTitle">Figuring out D3</h1>
+		<br>
+		<br>
+		<div>
+			<h2 class="sectionHeading"><strong>Bar charts:</strong></h2>
+			Bar charts without using SVG:<br>
+			<div class="chartNoSVG"></div>
 
-		With SVG:<br>
-		<svg class="chartWithSVG"></svg>
+			Bar charts using SVG:<br>
+			<svg class="chartWithSVG"></svg>
+		</div>
+
+		<div>
+			<h2 class="sectionHeading"><strong>Force Layout Fun:</strong></h2>
+
+
+
+		</div>
+		
 	</body>
 	<script>
-		// Stick D3 stuff in here
+		// BAR CHARTS --------------------------------------------------
 		var data = [4, 8, 15, 16, 23, 42];
 
 		// Without SVG
@@ -77,5 +119,28 @@
 		    .attr("y", barHeight / 2)
 		    .attr("dy", ".35em")
 		    .text(function(d) { return d; });
+
+		//--------------------------------------------------------------
+
+
+		// FORCE LAYOUT ------------------------------------------------
+		
+		// Our dimensions of graphic area
+		var widthFL = 900,
+			heightFL = 640; 
+
+		// Define nodes array
+		var nodes = [
+						{x:   widthFL/3, y: heightFL/2},
+						{x: 2*widthFL/3, y: heightFL/2}
+					];
+		// Define links array
+		var links = [
+						{source: 0, target: 1},
+					];
+
+		
+		//--------------------------------------------------------------
+
 	</script>
 </html>
