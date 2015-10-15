@@ -15,7 +15,8 @@
 
 		<style>
 
-			html {
+			/* Set background for site */
+			body {
 				background: url(mainBackground.JPG) no-repeat center center fixed; 
 				-webkit-background-size: cover;
 			    -moz-background-size: cover;
@@ -23,17 +24,46 @@
 			    background-size: cover;
 			}
 
+			#content {
+				background: rgba(0, 0, 0, 0.0);
+				position: fixed;
+				left: 5%;
+				top: 75%;
+			}
+
+			#desc {
+				font-family: Arial, Helvetica, sans-serif;
+				font-size: 1.6em;
+				color: white;
+				width: 50%;
+				margin-right: 25px;
+				display: inline-block;
+			}
+
+			#startButton {
+				height: 25px;	/* wont work*/
+				width: 510px;
+				background-color: white;
+				border: none;
+				text-align: left;
+				font-family: Arial, Helvetica, sans-serif;
+			}
+
+
 		</style>
 
 	</head>
 	<body>
-		<!-- <div>
-
+		<div>
+			<div id="content">
+				<p id="desc">
+					This site provides tutorials and interactive tools to help you consolidate and eventually master the concepts you've been learning about in Inf1-CL. 
+					<br>
+					<br>
+					Note: These toosl focus on the 'Logic' strand of the course.
+				</p>
+				<button id="startButton">start ></button> 
+			</div>
 		</div>
-		<div id="headerBanner">
-			<h1>Computation & Logic</h1>
-		</div>
-		<div id="mainContent">
-		</div -->
 	</body>
 </html>
