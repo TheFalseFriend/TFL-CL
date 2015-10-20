@@ -24,45 +24,57 @@
 			    background-size: cover;
 			}
 
-			#content {
-				background: rgba(0, 0, 0, 0.0);
-				position: fixed;
-				left: 5%;
-				top: 75%;
+			#startButton {
+				text-align: left;
+				position: relative;
+				/*padding-top: 30%;*/
+				font-size: 1.6em;
+				font-weight: bold;
+				top: 150px;
 			}
 
-			#desc {
-				font-family: Arial, Helvetica, sans-serif;
+			#descDiv {
 				font-size: 1.6em;
 				color: white;
-				width: 50%;
-				margin-right: 25px;
-				display: inline-block;
+				font-weight: bold;
+			}
+			
+			.row {
+				/*display: -webkit-box;
+				display: -webkit-flex;
+				display: -ms-flexbox;
+				display:         flex;*/
 			}
 
-			#startButton {
-				height: 25px;	/* wont work*/
-				width: 510px;
-				background-color: white;
-				border: none;
-				text-align: left;
-				font-family: Arial, Helvetica, sans-serif;
+			#startButtonDiv {
+				/*display: flex;
+				flex-direction: column;*/
 			}
 
+			#startButtonDiv > button {
+				/*flex: 1;*/
+			}
 
+			#content {
+				position: relative;
+				top: 400px;
+			}
+			
 		</style>
 
 	</head>
 	<body>
-		<div>
-			<div id="content">
-				<p id="desc">
+		<div class="container">
+			<div class="row" id="content">
+				<div class="col-md-6" id="descDiv">
 					This site provides tutorials and interactive tools to help you consolidate and eventually master the concepts you've been learning about in Inf1-CL. 
 					<br>
 					<br>
-					Note: These toosl focus on the 'Logic' strand of the course.
-				</p>
-				<button id="startButton">start ></button> 
+					Note: These tools focus on the 'Logic' strand of the course.
+				</div>
+				<div class="col-md-6" id="startButtonDiv">
+					<a href="circuits.html" id="startButton" class="btn btn-default">> start</a>
+				</div>
 			</div>
 		</div>
 	</body>
