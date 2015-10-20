@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>TFL - Circuits</title>
+		<meta charset="utf-8">
+
+		<!-- CSS for bootstrap -->
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+		<!-- jQuery -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+		<!-- Bootstrap JavaScript -->
+		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+		<!-- D3 library -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+
+		<style>
+
+			body {
+				background:
+					radial-gradient(black 15%, transparent 16%) 0 0,
+					radial-gradient(black 15%, transparent 16%) 8px 8px,
+					radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px,
+					radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 8px 9px;
+					background-color:#282828;
+					background-size:16px 16px;
+			}
+
+			#toolbox {
+				position: relative;
+				border: 3px solid black;
+				left: 2%;
+				height: 550px;
+				background-color: white;
+			}
+
+			#buildArea {
+				position: relative;
+				left: 4%;
+				border: 3px solid black;
+				width: 69%;
+				height: 550px;
+				background-color: white;
+			}
+
+			#workbenchContainer {
+				position: relative;
+			}
+
+			#titleBanner {
+				color: white;
+			}
+
+
+
+		</style>
+
+	</head>
+
+	<body>
+		<div class="container-fluid text-center">
+			<h1 id="titleBanner">Circuits, Truth Tables, and Logic Functions</h1>
+		</div>
+		<div class="container-fluid" id="workbenchContainer">
+			<div class="row">
+				<div class="col-md-3" id="toolbox">
+					<h3>Toolbox</h3>
+					Choose logic gates to add to your circuit from this selection.
+					<br>
+					<br>
+					<br>
+					<button type="button" class="btn btn-large btn-primary btn-block">AND GATE <span class="glyphicon glyphicon-plus"></span></button>
+					<br>
+					<button type="button" class="btn btn-large btn-primary btn-block">OR GATE <span class="glyphicon  glyphicon-resize-full"></span></button>
+					<br>
+					<button type="button" class="btn btn-large btn-primary btn-block">NOT GATE <span class="glyphicon glyphicon-minus"></span></button>
+				</div>
+
+				<div class="col-md-9" id="buildArea">
+
+				</div>
+			</div>
+		</div>
+		
+
+		<script type="text/javascript">
+
+			var svgWorkbenchArea = d3.select("#buildArea")
+				.append("svg")
+	            .attr('width', $("#buildArea").width())
+	            .attr('height',  $("#buildArea").height());
+
+	        var svgToolboxArea = d3.select("#toolbox")
+	        					   .append("svg");
+
+	        var drag = d3.behavior.drag()  
+             			 .on('dragstart', function() { circle.style('fill', 'red'); })
+             			 .on('drag', function() { circle.attr('cx', d3.event.x)
+                                            .attr('cy', d3.event.y); })
+             			 .on('dragend', function() { circle.style('fill', 'black'); });
+
+            var circle = svgWorkbenchArea.selectAll('.draggableCircle')  
+                .data([{ x: ($("#buildArea").width() / 2), y: ($("#buildArea").height() / 2), r: 25 }])
+                .enter()
+                .append('svg:circle')
+                .attr('class', 'draggableCircle')
+                .attr('cx', function(d) { return d.x; })
+                .attr('cy', function(d) { return d.y; })
+                .attr('r', function(d) { return d.r; })
+                .call(drag)
+                .style('fill', 'black');
+
+		</script>
+
+	</body>
+</html>
