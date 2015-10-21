@@ -53,6 +53,28 @@
 				color: white;
 			}
 
+			.andGate {
+				cursor: move;
+				fill: red;
+				stroke: #000;
+				stroke-width: 1.5px;
+			}
+
+			.orGate {
+				cursor: move;
+				fill: orange;
+				stroke: #000;
+				stroke-width: 1.5px;
+			}
+
+			.notGate {
+				cursor: move;
+				fill: green;
+				stroke: #000;
+				stroke-width: 1.5px;
+			}
+
+
 
 
 		</style>
@@ -71,11 +93,19 @@
 					<br>
 					<br>
 					<br>
-					<button type="button" class="btn btn-large btn-primary btn-block">AND GATE <span class="glyphicon glyphicon-plus"></span></button>
+					<button type="button" class="btn btn-large btn-primary btn-block" id="addAND">AND GATE<br><span class="glyphicon glyphicon-plus"></span></button>
+					
 					<br>
-					<button type="button" class="btn btn-large btn-primary btn-block">OR GATE <span class="glyphicon  glyphicon-resize-full"></span></button>
+					
+					<button type="button" class="btn btn-large btn-primary btn-block" id="addOR">OR GATE<br><span class="glyphicon  glyphicon-resize-full"></span></button>
+					
 					<br>
-					<button type="button" class="btn btn-large btn-primary btn-block">NOT GATE <span class="glyphicon glyphicon-minus"></span></button>
+					
+					<button type="button" class="btn btn-large btn-primary btn-block" id="addNOT">NOT GATE<br><span class="glyphicon glyphicon-minus"></span></button>
+					
+					<br>
+
+					<button type="button" class="btn btn-large btn-danger btn-block" id="clearCanvas" data-toggle="modal" data-target="#clearConfirmationMsg">CLEAR WORKBENCH<br><span class="glyphicon glyphicon-remove"></span></button>
 				</div>
 
 				<div class="col-md-9" id="buildArea">
@@ -83,34 +113,85 @@
 				</div>
 			</div>
 		</div>
+
+		<div id="clearConfirmationMsg" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+		    	<div class="modal-content">
+		      		<div class="modal-header">
+		        		<button type="button" class="close" data-dismiss="modal">&times;</button>
+		        			<h4 class="modal-title">Clear entire workbench?</h4>
+		      		</div>
+		      		<div class="modal-body">
+		        		<p>Are you sure you want to totally clear the workbench and start over?</p>
+		      		</div>
+		      		<div class="modal-footer">
+		       	 		<button type="button" id="executeClear" class="btn btn-success btn-block" data-dismiss="modal">Yes</button>
+		       	 		<button type="button" class="btn btn-danger btn-block" data-dismiss="modal">No</button>
+		      		</div>
+		    	</div>
+
+		  	</div>
+		</div>
 		
 
 		<script type="text/javascript">
+			
 
 			var svgWorkbenchArea = d3.select("#buildArea")
 				.append("svg")
 	            .attr('width', $("#buildArea").width())
 	            .attr('height',  $("#buildArea").height());
 
-	        var svgToolboxArea = d3.select("#toolbox")
-	        					   .append("svg");
+	    
 
-	        var drag = d3.behavior.drag()  
-             			 .on('dragstart', function() { circle.style('fill', 'red'); })
-             			 .on('drag', function() { circle.attr('cx', d3.event.x)
-                                            .attr('cy', d3.event.y); })
-             			 .on('dragend', function() { circle.style('fill', 'black'); });
+	    	var drag = d3.behavior.drag()
+	    		.on("drag", gateMoved)
+	    		.on("dragstart", dragBegun)
+	    		.on("dragend", dragEnded);
+          
 
-            var circle = svgWorkbenchArea.selectAll('.draggableCircle')  
-                .data([{ x: ($("#buildArea").width() / 2), y: ($("#buildArea").height() / 2), r: 25 }])
-                .enter()
-                .append('svg:circle')
-                .attr('class', 'draggableCircle')
-                .attr('cx', function(d) { return d.x; })
-                .attr('cy', function(d) { return d.y; })
-                .attr('r', function(d) { return d.r; })
-                .call(drag)
-                .style('fill', 'black');
+	    	function gateMoved(d) {
+	    		var x = d3.event.x;
+	    		var y = d3.event.y;
+
+	    		d3.select(this).attr("transform", "translate(" + x + "," + y + ")");
+	    	}
+
+	    	function dragBegun() {
+	    		d3.select(this).transition()
+			      .ease("elastic")
+			      .duration(500)
+			      .attr("r", 48);
+	    	}
+
+	    	function dragEnded() {
+	    		d3.select(this).transition()
+			      .ease("elastic")
+			      .duration(500)
+			      .attr("r", 30);
+	    	}
+
+            // Invoke to add a single gate of type 'gateType' to the workbench area
+            function addGate(event) {
+            	svgWorkbenchArea.append("circle")
+            		.attr("r", 30)
+            		.attr("class", event.data.gateType)
+            		.attr("transform", "translate(" + $("#buildArea").width() / 2 + "," +  $("#buildArea").height() / 2 + ")")
+            		.call(drag)
+            }
+
+            function clearWorkbench() {
+            	svgWorkbenchArea.selectAll(".gate").remove();
+            }
+
+            $("#addAND").click({ gateType: 'andGate gate' }, addGate)
+            $("#addOR").click({ gateType: 'orGate gate' }, addGate)
+            $("#addNOT").click({ gateType: 'notGate gate' }, addGate)
+
+            $("#executeClear").click(clearWorkbench)
+
+         
+
 
 		</script>
 
