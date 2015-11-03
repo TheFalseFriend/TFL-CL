@@ -20,6 +20,8 @@ body {
 	position: relative;
 	left: 4%;
 	border: 3px solid black;
+	padding-left: 0px;
+	padding-right: 0px;
 	width: 69%;
 	height: 550px;
 	background-color: white;
