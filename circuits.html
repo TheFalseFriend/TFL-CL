@@ -5,7 +5,7 @@
 		<meta charset="utf-8">
 
 		<!-- CSS for bootstrap -->
-		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css"/>
 
 		<!-- jQuery -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -14,71 +14,13 @@
 		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
 		<!-- D3 library -->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+		<script defer src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 
-		<style>
+		<!-- driving jscript -->
+		<script defer type="text/javascript" src="scripts/circuitLogic.js"></script>
 
-			body {
-				background:
-					radial-gradient(black 15%, transparent 16%) 0 0,
-					radial-gradient(black 15%, transparent 16%) 8px 8px,
-					radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px,
-					radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 8px 9px;
-					background-color:#282828;
-					background-size:16px 16px;
-			}
-
-			#toolbox {
-				position: relative;
-				border: 3px solid black;
-				left: 2%;
-				height: 550px;
-				background-color: white;
-			}
-
-			#buildArea {
-				position: relative;
-				left: 4%;
-				border: 3px solid black;
-				width: 69%;
-				height: 550px;
-				background-color: white;
-			}
-
-			#workbenchContainer {
-				position: relative;
-			}
-
-			#titleBanner {
-				color: white;
-			}
-
-			.andGate {
-				cursor: move;
-				fill: red;
-				stroke: #000;
-				stroke-width: 1.5px;
-			}
-
-			.orGate {
-				cursor: move;
-				fill: orange;
-				stroke: #000;
-				stroke-width: 1.5px;
-			}
-
-			.notGate {
-				cursor: move;
-				fill: green;
-				stroke: #000;
-				stroke-width: 1.5px;
-			}
-
-
-
-
-		</style>
-
+		<!-- Page style -->
+		<link rel="stylesheet" href="styles/circuitsStyle.css" type="text/css"/>
 	</head>
 
 	<body>
@@ -109,7 +51,7 @@
 				</div>
 
 				<div class="col-md-9" id="buildArea">
-
+					
 				</div>
 			</div>
 		</div>
@@ -132,68 +74,5 @@
 
 		  	</div>
 		</div>
-		
-
-		<script type="text/javascript">
-			
-
-			var svgWorkbenchArea = d3.select("#buildArea")
-				.append("svg")
-	            .attr('width', $("#buildArea").width())
-	            .attr('height',  $("#buildArea").height());
-
-	    
-
-	    	var drag = d3.behavior.drag()
-	    		.on("drag", gateMoved)
-	    		.on("dragstart", dragBegun)
-	    		.on("dragend", dragEnded);
-          
-
-	    	function gateMoved(d) {
-	    		var x = d3.event.x;
-	    		var y = d3.event.y;
-
-	    		d3.select(this).attr("transform", "translate(" + x + "," + y + ")");
-	    	}
-
-	    	function dragBegun() {
-	    		d3.select(this).transition()
-			      .ease("elastic")
-			      .duration(500)
-			      .attr("r", 48);
-	    	}
-
-	    	function dragEnded() {
-	    		d3.select(this).transition()
-			      .ease("elastic")
-			      .duration(500)
-			      .attr("r", 30);
-	    	}
-
-            // Invoke to add a single gate of type 'gateType' to the workbench area
-            function addGate(event) {
-            	svgWorkbenchArea.append("circle")
-            		.attr("r", 30)
-            		.attr("class", event.data.gateType)
-            		.attr("transform", "translate(" + $("#buildArea").width() / 2 + "," +  $("#buildArea").height() / 2 + ")")
-            		.call(drag)
-            }
-
-            function clearWorkbench() {
-            	svgWorkbenchArea.selectAll(".gate").remove();
-            }
-
-            $("#addAND").click({ gateType: 'andGate gate' }, addGate)
-            $("#addOR").click({ gateType: 'orGate gate' }, addGate)
-            $("#addNOT").click({ gateType: 'notGate gate' }, addGate)
-
-            $("#executeClear").click(clearWorkbench)
-
-         
-
-
-		</script>
-
 	</body>
 </html>
