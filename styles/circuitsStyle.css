@@ -1,0 +1,55 @@
+body {
+	background:
+		radial-gradient(black 15%, transparent 16%) 0 0,
+		radial-gradient(black 15%, transparent 16%) 8px 8px,
+		radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px,
+		radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 8px 9px;
+		background-color:#282828;
+		background-size:16px 16px;
+}
+
+#toolbox {
+	position: relative;
+	border: 3px solid black;
+	left: 2%;
+	height: 550px;
+	background-color: white;
+}
+
+#buildArea {
+	position: relative;
+	left: 4%;
+	border: 3px solid black;
+	width: 69%;
+	height: 550px;
+	background-color: white;
+}
+
+#workbenchContainer {
+	position: relative;
+}
+
+#titleBanner {
+	color: white;
+}
+
+.andGate {
+	cursor: move;
+	fill: red;
+	stroke: #000;
+	stroke-width: 1.5px;
+}
+
+.orGate {
+	cursor: move;
+	fill: orange;
+	stroke: #000;
+	stroke-width: 1.5px;
+}
+
+.notGate {
+	cursor: move;
+	fill: green;
+	stroke: #000;
+	stroke-width: 1.5px;
+}
