@@ -1,55 +1,62 @@
+var width = $('#buildArea').width(),
+	height = $('#buildArea').height();
+
 var svgWorkbenchArea = d3.select('#svgDrawArea')
-	            .attr('width', $('#buildArea').width())
-	            .attr('height',  $('#buildArea').height());
-
-	    
-
-var drag = d3.behavior.drag()
-	.on('drag', gateMoved);
+				.attr('oncontextmenu', 'return false;')
+	            .attr('width', width)
+	            .attr('height', height);
 
 // Register our button handlers 
-$('#addAND').click({ gateType:'andGate' }, addGate)
-$('#addOR').click({ gateType: 'orGate' }, addGate)
-$('#addNOT').click({ gateType: 'notGate' }, addGate)
+$('#addAND').click({ gateType:'andGate' }, restart)
+$('#addOR').click({ gateType: 'orGate' }, restart)
+$('#addNOT').click({ gateType: 'notGate' }, restart)
 $('#executeClear').click(clearWorkbench)
 
-function gateMoved(d) {
-	var x = d3.event.x;
-	var y = d3.event.y;
+var force = d3.layout.force()
+    .size([width, height])
+    .nodes([]) // initialize with a single node
+    .linkDistance(30)
+    .gravity(0)
+    .charge(-20)
+    .chargeDistance(50)
+    .on("tick", tick);
 
-	d3.select(this).attr('x',x)
-				   .attr('y',y);
+var nodes = force.nodes(),
+    links = force.links(),
+    node = svgWorkbenchArea.selectAll(".node"),
+    link = svgWorkbenchArea.selectAll(".link");
+
+function tick() {
+	// link.attr("x1", function(d) { return d.source.x; })
+	//       .attr("y1", function(d) { return d.source.y; })
+	//       .attr("x2", function(d) { return d.target.x; })
+	//       .attr("y2", function(d) { return d.target.y; });
+
+	node.attr('x', function(d) { return d.x; })
+	    .attr('y', function(d) { return d.y; });
 }
 
-// Invoke to add a single gate of type 'gateType' (contained in event object) to the workbench area
-function addGate(event) {
-	switch(event.data.gateType) {
-		case 'andGate':
-			svgWorkbenchArea.append('use')
-							.attr('xlink:href','svgs/gateSVGS.svg#andGateGlyph')
-							.attr('x',$('#svgDrawArea').width() / 2)
-							.attr('y',$('#svgDrawArea').height() / 2)
-							.call(drag);
-			break;
+function randomRange(min, max) {
+    return Math.random() * (max - min) + min;
+}
 
-		case 'orGate':
-			svgWorkbenchArea.append('use')
-							.attr('xlink:href','svgs/gateSVGS.svg#orGateGlyph')
-							.attr('x',$('#svgDrawArea').width() / 2)
-							.attr('y',$('#svgDrawArea').height() / 2)
-							.call(drag);
-			break;
-		case 'notGate':
-			svgWorkbenchArea.append('use')
-							.attr('xlink:href','svgs/gateSVGS.svg#notGateGlyph')
-							.attr('x',$('#svgDrawArea').width() / 2)
-							.attr('y',$('#svgDrawArea').height() / 2)
-							.call(drag);
-			break;
-		default:
-			alert('dead')
-			break;
-	}
+function restart(event) {
+	console.log(event.data);
+	var newNode = {x:randomRange(0,width), y:randomRange(0,height)}
+	nodes.push(newNode)
+
+	link = link.data(links);
+
+	// link.enter().insert("line", ".node")
+ //    	.attr("class", "link");
+
+	node = node.data(nodes);
+
+  	node.enter().append('use')
+        	.attr('xlink:href','svgs/gateSVGS.svg#' + event.data.gateType + 'Glyph')
+            .call(force.drag);
+
+	force.start();
 }
 
 function clearWorkbench() {
