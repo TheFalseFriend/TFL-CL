@@ -5,9 +5,7 @@ var svgWorkbenchArea = d3.select('#svgDrawArea')
 	    
 
 var drag = d3.behavior.drag()
-	.on('drag', gateMoved)
-	.on('dragstart', dragBegun)
-	.on('dragend', dragEnded);
+	.on('drag', gateMoved);
 
 // Register our button handlers 
 $('#addAND').click({ gateType:'andGate' }, addGate)
