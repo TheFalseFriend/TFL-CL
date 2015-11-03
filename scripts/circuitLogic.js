@@ -1,5 +1,4 @@
-var svgWorkbenchArea = d3.select("#buildArea")
-				.append("svg")
+var svgWorkbenchArea = d3.select("#svgDrawArea")
 	            .attr('width', $("#buildArea").width())
 	            .attr('height',  $("#buildArea").height());
 
@@ -37,7 +36,7 @@ var svgWorkbenchArea = d3.select("#buildArea")
             	svgWorkbenchArea.append("circle")
             		.attr("r", 30)
             		.attr("class", event.data.gateType)
-            		.attr("transform", "translate(" + $("#buildArea").width() / 2 + "," +  $("#buildArea").height() / 2 + ")")
+            		.attr("transform", "translate(" + $("#svgDrawArea").width() / 2 + "," +  $("#svgDrawArea").height() / 2 + ")")
             		.call(drag)
             }
 
