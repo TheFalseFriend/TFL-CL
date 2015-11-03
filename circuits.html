@@ -51,7 +51,26 @@
 				</div>
 
 				<div class="col-md-9" id="buildArea">
-					
+					<svg id="svgDrawArea">
+						<defs>
+							<g id="andGateGlyph">
+								<path d="M0 0 C 45 0, 45 40, 0 40" stroke="black" fill="transparent"/>
+								<path d="M0,0 V 40" stroke="black" fill="transparent"/>>
+							</g>
+
+							<g id="orGateGlyph">
+								<path d="M0 0 C 60 10, 60 30, 0 40 M0 0 C 10 0, 10 40, 0 40" stroke="black" fill="transparent"/>
+								<!-- <path d="M0 0 C 10 0, 10 40, 0 40" stroke="black" fill="transparent"/> -->
+							</g>
+
+							<g id="notGateGlyph">
+								<!-- <polygon points="0,0 " stroke="black" fill="transparent"/> -->
+								<path d="M0 0 V 40, L20 20, L0 0" stroke="black" fill="transparent"/>
+								<circle cx="25" cy="20" r="5" stroke-width="1" stroke="black" fill="transparent"/>
+							</g>
+						</defs>
+
+					</svg>
 				</div>
 			</div>
 		</div>
