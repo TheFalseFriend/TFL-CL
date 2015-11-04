@@ -12,6 +12,69 @@ $('#addOR').click({ gateType: 'orGate' }, restart)
 $('#addNOT').click({ gateType: 'notGate' }, restart)
 $('#executeClear').click(clearWorkbench)
 
+ctrlDepressed = false;
+
+d3.select(window)
+	.on('keydown', keydown)
+	.on('keyup', keyup);
+
+
+
+function keydown() {
+	if (d3.event.ctrlKey) { ctrlDepressed = true; }
+}
+
+function keyup() {
+	if (d3.event.keyCode === 17) { // ctrl
+		if (mouseDepressed) { svgWorkbenchArea.select('.newConnectionBody').remove(); }
+		ctrlDepressed = false; 
+	}
+}
+
+
+
+svgWorkbenchArea.on('mousedown', mousedown)
+				.on('mousemove', mousemove)
+				.on('mouseup', mouseup);
+
+var newConnectionStartPt = null;
+var mouseDepressed = false;
+var newConnection = null;
+
+function mousedown() {
+	if (ctrlDepressed) {
+
+		mouseDepressed = true;
+
+		var x = d3.mouse(this)[0],
+			y = d3.mouse(this)[1];
+
+		newConnectionStartPt=[x,y];
+
+		newConnection = svgWorkbenchArea.append('path')
+							.attr('d', 'M ' + newConnectionStartPt[0] + ',' + newConnectionStartPt[1] + ' L ' + newConnectionStartPt[0] + ',' + newConnectionStartPt[1])
+							.attr('stroke', 'black')
+							.attr('class', 'newConnectionBody');
+	}
+}
+
+function mousemove() {
+	if (ctrlDepressed && mouseDepressed) {
+			newConnection.attr('d', 'M ' + newConnectionStartPt[0] + ',' + newConnectionStartPt[1] + ' L ' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
+	}
+}
+
+function mouseup() {
+	if(ctrlDepressed) {
+		svgWorkbenchArea.select('.newConnectionBody').remove();
+		newConnection = null;
+		newConnectionStartPt = null;	
+	}
+	
+
+	mouseDepressed = false;
+}
+
 var force = d3.layout.force()
     .size([width, height])
     .nodes([]) // initialize with a single node
@@ -42,7 +105,7 @@ function randomRange(min, max) {
 
 function restart(event) {
 	console.log(event.data);
-	var newNode = {x:randomRange(0,width), y:randomRange(0,height)}
+	var newNode = {x:randomRange(0,width-40), y:randomRange(0,height-40)}
 	nodes.push(newNode)
 
 	link = link.data(links);
