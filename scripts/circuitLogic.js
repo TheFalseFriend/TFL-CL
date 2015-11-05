@@ -7,9 +7,9 @@ var svgWorkbenchArea = d3.select('#svgDrawArea')
 	            .attr('height', height);
 
 // Register our button handlers 
-$('#addAND').click({ gateType:'andGate' }, restart)
-$('#addOR').click({ gateType: 'orGate' }, restart)
-$('#addNOT').click({ gateType: 'notGate' }, restart)
+$('#addAND').click({ gateType:'andGate' }, addNewGate)
+$('#addOR').click({ gateType: 'orGate' }, addNewGate)
+$('#addNOT').click({ gateType: 'notGate' }, addNewGate)
 $('#executeClear').click(clearWorkbench)
 
 ctrlDepressed = false;
@@ -22,6 +22,11 @@ d3.select(window)
 
 function keydown() {
 	if (d3.event.ctrlKey) { ctrlDepressed = true; }
+
+	// ctrl - for dragging
+	if(d3.event.keyCode === 17) {
+		node.call(force.drag);
+	}
 }
 
 function keyup() {
@@ -35,49 +40,74 @@ function keyup() {
 
 svgWorkbenchArea.on('mousedown', mousedown)
 				.on('mousemove', mousemove)
-				.on('mouseup', mouseup);
+				.on('mouseup.t', mouseup);
 
 var newConnectionStartPt = null;
+var mouseDownGate = null;
+var mouseUpGate = null;
 var mouseDepressed = false;
 var newConnection = null;
+var gateFunctions = {
+						'andGate': function(inputs) { 
+														for (var index in inputs) {
+														    if (inputs[index] == false) return false;
+														}
+														return true;
+													},
+
+						'orGate': function(inputs)  { 
+														for (var index in inputs) {
+														    if (inputs[index] === true) return true;
+														}
+														return false;
+													},
+
+						'notGate': function(inputs) { if (inputs[0] == true) return false; else return true; }	
+					};
+
+var gateCount = 0;
+var linkCount = 0;
 
 function mousedown() {
-	if (ctrlDepressed) {
+	if (mouseDownGate) return;
+	// if (ctrlDepressed) {
 
-		mouseDepressed = true;
+	// 	mouseDepressed = true;
 
-		var x = d3.mouse(this)[0],
-			y = d3.mouse(this)[1];
+	// 	var x = d3.mouse(this)[0],
+	// 		y = d3.mouse(this)[1];
 
-		newConnectionStartPt=[x,y];
+	// 	newConnectionStartPt=[x,y];
 
-		newConnection = svgWorkbenchArea.append('path')
-							.attr('d', 'M ' + newConnectionStartPt[0] + ',' + newConnectionStartPt[1] + ' L ' + newConnectionStartPt[0] + ',' + newConnectionStartPt[1])
-							.attr('stroke', 'black')
-							.attr('class', 'newConnectionBody');
-	}
+	// 	newConnection = svgWorkbenchArea.append('path')
+	// 						.attr('d', 'M ' + newConnectionStartPt[0] + ',' + newConnectionStartPt[1] + ' L ' + newConnectionStartPt[0] + ',' + newConnectionStartPt[1])
+	// 						.attr('stroke', 'black')
+	// 						.attr('class', 'newConnectionBody');
+	// }
 }
 
 function mousemove() {
-	if (ctrlDepressed && mouseDepressed) {
-			newConnection.attr('d', 'M ' + newConnectionStartPt[0] + ',' + newConnectionStartPt[1] + ' L ' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
-	}
+	if (!mouseDownGate) return;
+
+	newConnection.attr('d', 'M ' + mouseDownGate.x + ',' + mouseDownGate.y + ' L ' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
+	restart();
+	// if (ctrlDepressed && mouseDepressed) {
+	// 		newConnection.attr('d', 'M ' + newConnectionStartPt[0] + ',' + newConnectionStartPt[1] + ' L ' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
+	// }
 }
 
 function mouseup() {
-	if(ctrlDepressed) {
-		svgWorkbenchArea.select('.newConnectionBody').remove();
-		newConnection = null;
-		newConnectionStartPt = null;	
-	}
-	
-
-	mouseDepressed = false;
+	// console.log('overall mouseup');
+	// if(ctrlDepressed ) {
+	// 	svgWorkbenchArea.select('.newConnectionBody').remove();
+	// 	mouseDepressed = false;	
+	// }
 }
 
 var force = d3.layout.force()
     .size([width, height])
     .nodes([]) // initialize with a single node
+    .links([])
     .linkDistance(30)
     .gravity(0)
     .charge(-20)
@@ -103,22 +133,95 @@ function randomRange(min, max) {
     return Math.random() * (max - min) + min;
 }
 
-function restart(event) {
-	console.log(event.data);
-	var newNode = {x:randomRange(0,width-40), y:randomRange(0,height-40)}
-	nodes.push(newNode)
+function addNewGate(event) {
+
+	var newNode = { x: randomRange(0,width-40), 
+				    y: randomRange(0,height-40), 
+				    id: gateCount + '_' + event.data.gateType,
+				    inputs:[],
+				    outputVal: gateFunctions[event.data.gateType],
+				    outputLine: null,
+				    type: event.data.gateType
+				  };
+	nodes.push(newNode);
+	gateCount++;
+	restart();
+}
+var firstLink = true; // HAX
+
+function restart() {
+	
+
+	
+
+	
+	
 
 	link = link.data(links);
-
-	// link.enter().insert("line", ".node")
- //    	.attr("class", "link");
+	link.enter().append("line")
+    	.attr("class", "link");
 
 	node = node.data(nodes);
 
   	node.enter().append('use')
-        	.attr('xlink:href','svgs/gateSVGS.svg#' + event.data.gateType + 'Glyph')
-            .call(force.drag);
+        	.attr('xlink:href', function(d) { return 'svgs/gateSVGS.svg#' + d.type + 'Glyph'; })
+            // .call(force.drag)
+            .on('mouseup', function(d) {
+            		
+            	console.log(mouseDownGate);
+            	console.log(mouseUpGate);
+            	if (!mouseDownGate) return;
 
+            	mouseUpGate = d;
+
+            	// if (mouseUpGate === mouseDownGate) return; // drag to self
+
+            	if (firstLink) {
+	            	var newLink = { source: mouseDownGate, target:mouseUpGate, id: 'link_' + linkCount, value: false }
+	            	firstLink = false;
+            	} else {
+            		var newLink = { source: mouseDownGate, target:mouseUpGate, id: 'link_' + linkCount, value: mouseDownGate.outputVal(mouseDownGate.inputs) }
+            		mouseUpGate.inputs = newLink;
+            	}
+            	
+            	linkCount++;
+            	links.push(newLink);
+            	console.log('connection values: ');
+            	$.each(links, function(i,val) { 
+            		console.log(val); }
+            	);
+            	restart();
+
+
+
+     //        	console.log(newConnection);
+     //        	if (newConnection) {
+     //        		var newStartNode = { x:newConnectionStartPt[0],y:newConnectionStartPt[1],fixed:true};
+     //        		nodes.push(newStartNode);
+     //        		var newInputLine = { source: newStartNode, target: d};
+     //        		links.push(newInputLine);
+					// link = link.data(links);
+					// node = node.data(nodes);
+					// node.enter().append('circle')
+					// 			.attr('fill','red');
+					// link.enter().append('line')
+					// 			.attr('fill','red');
+					// 			console.log('here');
+					// newConnection = null;
+					// newConnectionStartPt = null;
+            	// }
+            })
+            .on('mousedown', function(d) {
+            	mouseDownGate = d;
+            	// console.log(mouseDownGate);
+            	newConnection = svgWorkbenchArea.append('path')
+							.attr('d', 'M ' + mouseDownGate.x + ',' + mouseDownGate.y + ' L ' + mouseDownGate.x + ',' + mouseDownGate.y)
+							.attr('stroke', 'black')
+							.attr('class', 'newConnectionBody');
+				restart();
+
+
+            });
 	force.start();
 }
 
