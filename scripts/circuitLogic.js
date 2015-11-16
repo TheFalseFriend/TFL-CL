@@ -1,114 +1,52 @@
 var width = $('#buildArea').width(),
-	height = $('#buildArea').height();
+    height = $('#buildArea').height();
 
 var svgWorkbenchArea = d3.select('#svgDrawArea')
-				.attr('oncontextmenu', 'return false;')
-	            .attr('width', width)
-	            .attr('height', height);
+    .attr('oncontextmenu', 'return false;')
+    .attr('width', width)
+    .attr('height', height);
 
-// Register our button handlers 
+// Register our button handlers
 $('#addAND').click({ gateType:'andGate' }, addNewGate)
 $('#addOR').click({ gateType: 'orGate' }, addNewGate)
 $('#addNOT').click({ gateType: 'notGate' }, addNewGate)
 $('#executeClear').click(clearWorkbench)
 
-ctrlDepressed = false;
+var zDepressed = false
+var ctrlDepressed = false;
 
-d3.select(window)
-	.on('keydown', keydown)
-	.on('keyup', keyup);
-
-
-
-function keydown() {
-	if (d3.event.ctrlKey) { ctrlDepressed = true; }
-
-	// ctrl - for dragging
-	if(d3.event.keyCode === 17) {
-		node.call(force.drag);
-	}
-}
-
-function keyup() {
-	if (d3.event.keyCode === 17) { // ctrl
-		if (mouseDepressed) { svgWorkbenchArea.select('.newConnectionBody').remove(); }
-		ctrlDepressed = false; 
-	}
-}
+// line displayed when dragging new nodes
+var drag_line = svgWorkbenchArea.append('svg:path')
+    .attr('class', 'link dragline hidden')
+    .attr('d', 'M0,0L0,0');
 
 
-
-svgWorkbenchArea.on('mousedown', mousedown)
-				.on('mousemove', mousemove)
-				.on('mouseup.t', mouseup);
-
-var newConnectionStartPt = null;
-var mouseDownGate = null;
-var mouseUpGate = null;
-var mouseDepressed = false;
-var newConnection = null;
 var gateFunctions = {
-						'andGate': function(inputs) { 
-														for (var index in inputs) {
-														    if (inputs[index] == false) return false;
-														}
-														return true;
-													},
+    'andGate': function(inputs) {
+        for (var index in inputs) {
+            if (inputs[index] == false) return false;
+        }
+        return true;
+    },
 
-						'orGate': function(inputs)  { 
-														for (var index in inputs) {
-														    if (inputs[index] === true) return true;
-														}
-														return false;
-													},
+    'orGate': function(inputs)  {
+        for (var index in inputs) {
+            if (inputs[index] === true) return true;
+        }
+        return false;
+    },
 
-						'notGate': function(inputs) { if (inputs[0] == true) return false; else return true; }	
-					};
+    'notGate': function(inputs) { if (inputs[0] == true) return false; else return true; }
+};
 
 var gateCount = 0;
-var linkCount = 0;
 
-function mousedown() {
-	if (mouseDownGate) return;
-	// if (ctrlDepressed) {
-
-	// 	mouseDepressed = true;
-
-	// 	var x = d3.mouse(this)[0],
-	// 		y = d3.mouse(this)[1];
-
-	// 	newConnectionStartPt=[x,y];
-
-	// 	newConnection = svgWorkbenchArea.append('path')
-	// 						.attr('d', 'M ' + newConnectionStartPt[0] + ',' + newConnectionStartPt[1] + ' L ' + newConnectionStartPt[0] + ',' + newConnectionStartPt[1])
-	// 						.attr('stroke', 'black')
-	// 						.attr('class', 'newConnectionBody');
-	// }
-}
-
-function mousemove() {
-	if (!mouseDownGate) return;
-
-	newConnection.attr('d', 'M ' + mouseDownGate.x + ',' + mouseDownGate.y + ' L ' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
-	restart();
-	// if (ctrlDepressed && mouseDepressed) {
-	// 		newConnection.attr('d', 'M ' + newConnectionStartPt[0] + ',' + newConnectionStartPt[1] + ' L ' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
-	// }
-}
-
-function mouseup() {
-	// console.log('overall mouseup');
-	// if(ctrlDepressed ) {
-	// 	svgWorkbenchArea.select('.newConnectionBody').remove();
-	// 	mouseDepressed = false;	
-	// }
-}
 
 var force = d3.layout.force()
     .size([width, height])
     .nodes([]) // initialize with a single node
     .links([])
-    .linkDistance(30)
+    .linkDistance(200)
     .gravity(0)
     .charge(-20)
     .chargeDistance(50)
@@ -116,17 +54,19 @@ var force = d3.layout.force()
 
 var nodes = force.nodes(),
     links = force.links(),
-    node = svgWorkbenchArea.selectAll(".node"),
-    link = svgWorkbenchArea.selectAll(".link");
+    node = svgWorkbenchArea.selectAll('use'),
+    link = svgWorkbenchArea.selectAll('.link');
+
+
 
 function tick() {
-	// link.attr("x1", function(d) { return d.source.x; })
-	//       .attr("y1", function(d) { return d.source.y; })
-	//       .attr("x2", function(d) { return d.target.x; })
-	//       .attr("y2", function(d) { return d.target.y; });
+     link.attr("x1", function(d) { return getEntryExitPoint(d.source,'out')[0]; })
+           .attr("y1", function(d) { return getEntryExitPoint(d.source,'out')[1]; })
+           .attr("x2", function(d) { return getEntryExitPoint(d.target,'in')[0]; })
+           .attr("y2", function(d) { return getEntryExitPoint(d.target,'in')[1]; });
 
-	node.attr('x', function(d) { return d.x; })
-	    .attr('y', function(d) { return d.y; });
+    node.attr('x', function(d) { return d.x; })
+        .attr('y', function(d) { return d.y; });
 }
 
 function randomRange(min, max) {
@@ -135,97 +75,188 @@ function randomRange(min, max) {
 
 function addNewGate(event) {
 
-	var newNode = { x: randomRange(0,width-40), 
-				    y: randomRange(0,height-40), 
-				    id: gateCount + '_' + event.data.gateType,
-				    inputs:[],
-				    outputVal: gateFunctions[event.data.gateType],
-				    outputLine: null,
-				    type: event.data.gateType
-				  };
-	nodes.push(newNode);
-	gateCount++;
-	restart();
+    var newNode = { x: randomRange(0,width-40),
+        y: randomRange(0,height-40),
+        id: gateCount + '_' + event.data.gateType,
+        inputs:[],
+        outputVal: gateFunctions[event.data.gateType],
+        outputLine: null,
+        type: event.data.gateType
+    };
+    nodes.push(newNode);
+    gateCount++;
+    restart();
 }
-var firstLink = true; // HAX
+
+
+var mouseDownNode = null;
+var mouseUpNode = null;
+
+var leavingXPts = {'andGate' : 34, 'orGate' : 45, 'notGate' : 30, 'oneInput' : 0, 'zeroInput' :0};
+var leavingYPts = {'andGate' : 20.1, 'orGate' : 20.5, 'notGate' : 20.5, 'oneInput' : 0, 'zeroInput' : 0};
+
+var enteringXPts = {'andGate' : 0, 'orGate' : 8, 'notGate' : 0};
+var enteringYPts = {'andGate' : 20.1, 'orGate' : 20.5, 'notGate' : 20.5};
+
+
+function getEntryExitPoint(gate, inout) {
+    if(inout == 'out') {
+        var x = leavingXPts[gate.type] + gate.x;
+        var y = leavingYPts[gate.type] + gate.y ;
+        return [x,y];
+    } else if(inout == 'in') {
+        var x = enteringXPts[gate.type] + gate.x;
+        var y = enteringYPts[gate.type] + gate.y ;
+        return [x,y];
+    }
+}
 
 function restart() {
-	
 
-	
+    link = link.data(links);
+    link.enter().append('line')
+        .attr('class', 'connection');
 
-	
-	
+    node = node.data(nodes);
 
-	link = link.data(links);
-	link.enter().append("line")
-    	.attr("class", "link");
+    node.enter().append('use')
+        .attr('xlink:href', function(d) { return 'svgs/gateSVGS.svg#' + d.type + 'Glyph'; })
+        .attr('id', function(d) {return d.id})
+        .on('mouseup', function(d) {
+            if(!mouseDownNode) return;
 
-	node = node.data(nodes);
+            mouseUpNode = d;
 
-  	node.enter().append('use')
-        	.attr('xlink:href', function(d) { return 'svgs/gateSVGS.svg#' + d.type + 'Glyph'; })
-            // .call(force.drag)
-            .on('mouseup', function(d) {
-            		
-            	console.log(mouseDownGate);
-            	console.log(mouseUpGate);
-            	if (!mouseDownGate) return;
+            drag_line.classed('hidden', true);
 
-            	mouseUpGate = d;
+            if(mouseDownNode === mouseUpNode) { return; }
 
-            	// if (mouseUpGate === mouseDownGate) return; // drag to self
+            var newLink;
 
-            	if (firstLink) {
-	            	var newLink = { source: mouseDownGate, target:mouseUpGate, id: 'link_' + linkCount, value: false }
-	            	firstLink = false;
-            	} else {
-            		var newLink = { source: mouseDownGate, target:mouseUpGate, id: 'link_' + linkCount, value: mouseDownGate.outputVal(mouseDownGate.inputs) }
-            		mouseUpGate.inputs = newLink;
-            	}
-            	
-            	linkCount++;
-            	links.push(newLink);
-            	console.log('connection values: ');
-            	$.each(links, function(i,val) { 
-            		console.log(val); }
-            	);
-            	restart();
+            newLink = { source: mouseDownNode, target:mouseUpNode };
+
+            links.push(newLink);
+
+            mouseDownNode = null;
+            mouseUpNode = null;
+            restart();
+
+        })
+        .on('mousedown', function(d) {
+            if(ctrlDepressed) return;
 
 
+            var lineLeavePt = getEntryExitPoint(d,'out');
+            mouseDownNode = d;
 
-     //        	console.log(newConnection);
-     //        	if (newConnection) {
-     //        		var newStartNode = { x:newConnectionStartPt[0],y:newConnectionStartPt[1],fixed:true};
-     //        		nodes.push(newStartNode);
-     //        		var newInputLine = { source: newStartNode, target: d};
-     //        		links.push(newInputLine);
-					// link = link.data(links);
-					// node = node.data(nodes);
-					// node.enter().append('circle')
-					// 			.attr('fill','red');
-					// link.enter().append('line')
-					// 			.attr('fill','red');
-					// 			console.log('here');
-					// newConnection = null;
-					// newConnectionStartPt = null;
-            	// }
-            })
-            .on('mousedown', function(d) {
-            	mouseDownGate = d;
-            	// console.log(mouseDownGate);
-            	newConnection = svgWorkbenchArea.append('path')
-							.attr('d', 'M ' + mouseDownGate.x + ',' + mouseDownGate.y + ' L ' + mouseDownGate.x + ',' + mouseDownGate.y)
-							.attr('stroke', 'black')
-							.attr('class', 'newConnectionBody');
-				restart();
+            if(d.type == 'zeroInput' && zDepressed) {
+                svgWorkbenchArea.select('#' + d.id)
+                    .attr('xlink:href', 'svgs/gateSVGS.svg#oneInputGlyph')
+                d.type = 'oneInput'
+                return
+            } else if (d.type == 'oneInput' && zDepressed) {
+                svgWorkbenchArea.select('#' + d.id)
+                    .attr('xlink:href', 'svgs/gateSVGS.svg#zeroInputGlyph')
+                d.type = 'zeroInput'
+                return
+            }
 
+            drag_line
+                .style('marker-end', 'url(#end-arrow)')
+                .classed('hidden', false)
+                .attr('d', 'M' + lineLeavePt[0] + ',' + lineLeavePt[1] + 'L' + lineLeavePt[0] + ',' + lineLeavePt[1]);
 
-            });
-	force.start();
+            restart();
+        });
+    force.start();
 }
 
 function clearWorkbench() {
-	svgWorkbenchArea.selectAll('use').remove();
+    svgWorkbenchArea.selectAll('use').remove();
+    svgWorkbenchArea.selectAll('line').remove();
 }
+
+
+var inputLineCount = 0
+
+function mDownOnCanvas() {
+    console.log('outer')
+    if(ctrlDepressed || mouseDownNode) return;
+    console.log('inner')
+    var point = d3.mouse(this)
+    var newNode = { x: point[0],
+        y: point[1],
+        id: 'input_'+ inputLineCount,
+        inputs:'START',
+        outputVal: 1,
+        outputLine: null,
+        type: 'oneInput'
+    };
+    inputLineCount++;
+    nodes.push(newNode)
+    restart()
+
+}
+
+function mMoveOnCanvas() {
+    if(!mouseDownNode) return;
+
+    var leavePt = getEntryExitPoint(mouseDownNode, 'out');
+    // update drag line
+    drag_line.attr('d', 'M' + leavePt[0] + ',' + leavePt[1] + 'L' + d3.mouse(this)[0] + ',' + d3.mouse(this)[1]);
+
+    restart();
+
+}
+
+function mUpOnCanvas() {
+    if(mouseDownNode) {
+
+        // hide drag line
+        drag_line
+            .classed('hidden', true)
+            .style('marker-end', '');
+    }
+}
+
+var lastKeyDown = -1
+
+function keydown() {
+
+    if(lastKeyDown != -1) return
+
+    lastKeyDown = d3.event.keyCode
+    if (d3.event.ctrlKey) {
+        ctrlDepressed = true;
+        node.call(force.drag);
+    } else if(d3.event.keyCode === 90) {
+        zDepressed = true;
+    }
+
+}
+
+function keyup() {
+
+    lastKeyDown = -1;
+
+    if (d3.event.keyCode === 17) { // ctrl
+        ctrlDepressed = false;
+        node.on('mousedown.drag', null);
+    } else if(d3.event.keyCode === 90) {
+        zDepressed = false;
+        mouseDownNode = null
+    }
+}
+
+svgWorkbenchArea.on('mousedown', mDownOnCanvas)
+    .on('mouseup', mUpOnCanvas)
+    .on('mousemove', mMoveOnCanvas);
+
+d3.select(window)
+    .on('keydown', keydown)
+    .on('keyup', keyup);
+
+restart();
+
+
 
