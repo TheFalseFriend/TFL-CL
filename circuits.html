@@ -1,80 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>TFL - Circuits</title>
-		<meta charset="utf-8">
+<head>
+    <title>TFL - Circuits</title>
+    <meta charset="utf-8">
 
-		<!-- CSS for bootstrap -->
-		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css"/>
+    <!-- CSS for bootstrap -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css"/>
 
-		<!-- jQuery -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
-		<!-- Bootstrap JavaScript -->
-		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
-		<!-- D3 library -->
-		<script defer src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <!-- D3 library -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 
-		<!-- driving jscript -->
-		<script defer type="text/javascript" src="scripts/circuitLogic.js"></script>
+    <!-- driving jscript -->
+    <script defer type="text/javascript" src="scripts/circuitLogic.js"></script>
 
-		<!-- Page style -->
-		<link rel="stylesheet" href="styles/circuitsStyle.css" type="text/css"/>
-	</head>
+    <!-- Page style -->
+    <link rel="stylesheet" href="styles/circuitsStyle.css" type="text/css"/>
+</head>
 
-	<body>
-		<div class="container-fluid text-center">
-			<h1 id="titleBanner">Circuits, Truth Tables, and Logic Functions</h1>
-		</div>
-		<div class="container-fluid" id="workbenchContainer">
-			<div class="row">
-				<div class="col-md-3" id="toolbox">
-					<h3>Toolbox</h3>
-					Choose logic gates to add to your circuit from this selection.
-					<br>
-					<br>
-					<br>
-					<button type="button" class="btn btn-large btn-primary btn-block" id="addAND">AND GATE<br><span class="glyphicon glyphicon-plus"></span></button>
-					
-					<br>
-					
-					<button type="button" class="btn btn-large btn-primary btn-block" id="addOR">OR GATE<br><span class="glyphicon  glyphicon-resize-full"></span></button>
-					
-					<br>
-					
-					<button type="button" class="btn btn-large btn-primary btn-block" id="addNOT">NOT GATE<br><span class="glyphicon glyphicon-minus"></span></button>
-					
-					<br>
+<body>
+<div class="container-fluid text-center">
+    <h1 id="titleBanner">Circuits, Truth Tables, and Logic Functions</h1>
+</div>
+<div class="container-fluid" id="workbenchContainer">
+    <div class="row">
+        <div class="col-md-3" id="toolbox">
+            <h3>Toolbox</h3>
+            Choose logic gates to add to your circuit from this selection.
+            <br>
+            <br>
+            <br>
+            <button type="button" class="btn btn-large btn-primary btn-block" id="addAND">AND GATE<br><span class="glyphicon glyphicon-plus"></span></button>
 
-					<button type="button" class="btn btn-large btn-danger btn-block" id="clearCanvas" data-toggle="modal" data-target="#clearConfirmationMsg">CLEAR WORKBENCH<br><span class="glyphicon glyphicon-remove"></span></button>
-				</div>
+            <br>
 
-				<div class="col-md-9" id="buildArea">
-					<svg id="svgDrawArea">
+            <button type="button" class="btn btn-large btn-primary btn-block" id="addOR">OR GATE<br><span class="glyphicon  glyphicon-resize-full"></span></button>
 
-					</svg>
-				</div>
-			</div>
-		</div>
+            <br>
 
-		<div id="clearConfirmationMsg" class="modal fade" role="dialog">
-			<div class="modal-dialog">
-		    	<div class="modal-content">
-		      		<div class="modal-header">
-		        		<button type="button" class="close" data-dismiss="modal">&times;</button>
-		        			<h4 class="modal-title">Clear entire workbench?</h4>
-		      		</div>
-		      		<div class="modal-body">
-		        		<p>Are you sure you want to totally clear the workbench and start over?</p>
-		      		</div>
-		      		<div class="modal-footer">
-		       	 		<button type="button" id="executeClear" class="btn btn-success btn-block" data-dismiss="modal">Yes</button>
-		       	 		<button type="button" class="btn btn-danger btn-block" data-dismiss="modal">No</button>
-		      		</div>
-		    	</div>
+            <button type="button" class="btn btn-large btn-primary btn-block" id="addNOT">NOT GATE<br><span class="glyphicon glyphicon-minus"></span></button>
 
-		  	</div>
-		</div>
-	</body>
+            <br>
+
+            <button type="button" class="btn btn-large btn-danger btn-block" id="clearCanvas" data-toggle="modal" data-target="#clearConfirmationMsg">CLEAR WORKBENCH<br><span class="glyphicon glyphicon-remove"></span></button>
+        </div>
+
+        <div class="col-md-9" id="buildArea">
+            <svg id="svgDrawArea">
+
+            </svg>
+        </div>
+    </div>
+</div>
+
+<div id="clearConfirmationMsg" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Clear entire workbench?</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to totally clear the workbench and start over?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="executeClear" class="btn btn-success btn-block" data-dismiss="modal">Yes</button>
+                <button type="button" class="btn btn-danger btn-block" data-dismiss="modal">No</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
 </html>
