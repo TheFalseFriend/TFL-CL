@@ -24,19 +24,19 @@ var drag_line = svgWorkbenchArea.append('svg:path')
 var gateFunctions = {
     'andGate': function(inputs) {
         for (var index in inputs) {
-            if (inputs[index] == false) return false;
+            if (inputs[index] == 0) return 0;
         }
-        return true;
+        return 1;
     },
 
     'orGate': function(inputs)  {
         for (var index in inputs) {
-            if (inputs[index] === true) return true;
+            if (inputs[index] === 1) return 1;
         }
-        return false;
+        return 0;
     },
 
-    'notGate': function(inputs) { if (inputs[0] == true) return false; else return true; }
+    'notGate': function(inputs) { if (inputs[0] == 1) return 0; else return 1; }
 };
 
 var gateCount = 0;
@@ -111,6 +111,52 @@ function getEntryExitPoint(gate, inout) {
     }
 }
 
+function updateSignals(gate) {
+
+    // set this gate's output line to the new output signal of this gate
+    if(gate.type == 'zeroInput' || gate.type == 'oneInput') {
+        gate.outputLine.val = gate.outputVal
+        //gate.outputLine.target.inputs = [gate.outputVal]
+        updateSignals(gate.outputLine.target)
+    } else {
+        //gate.outputVal = gate.outputVal(gate.inputs)
+
+        var incomingSignals = [];
+        for(i=0; i < gate.inputs.length; i++) {
+            incomingSignals.push(gate.inputs[i].val)
+        }
+
+        if(gate.outputLine === null) {
+            return
+        } else {
+            gate.outputLine.val = gate.outputVal(incomingSignals)
+            updateSignals(gate.outputLine.target)
+        }
+    }
+
+
+}
+
+function showConnectionLinesState() {
+
+    console.log('State of all connections in circuit:\n')
+    for(i = 0; i < links.length; i++) {
+        console.log(links[i])
+    }
+    console.log('\n\n')
+}
+
+function showGatesState() {
+
+    console.log('State of all gates in circuit:\n')
+    for(i = 0; i < nodes.length; i++) {
+        console.log(nodes[i])
+    }
+    console.log('\n\n')
+}
+
+var connectionLineCount = 0;
+
 function restart() {
 
     link = link.data(links);
@@ -133,9 +179,31 @@ function restart() {
 
             var newLink;
 
-            newLink = { source: mouseDownNode, target:mouseUpNode };
+            var newLinkSignal;
+
+            if(mouseDownNode.type == 'zeroInput' || mouseDownNode.type == 'oneInput') {
+                newLinkSignal = mouseDownNode.outputVal
+            } else {
+                var incomingSignals = [];
+                for(i=0; i < mouseDownNode.inputs.length; i++) {
+                    incomingSignals.push(mouseDownNode.inputs[i].val)
+                }
+
+                newLinkSignal =  mouseDownNode.outputVal(incomingSignals)
+            }
+
+            newLink = { source: mouseDownNode,
+                target: mouseUpNode,
+                id: 'connection_' + connectionLineCount,
+                val: newLinkSignal
+            };
+
+            mouseUpNode.inputs.push(newLink)
+            mouseDownNode.outputLine = newLink
 
             links.push(newLink);
+
+            connectionLineCount++;
 
             mouseDownNode = null;
             mouseUpNode = null;
@@ -153,11 +221,15 @@ function restart() {
                 svgWorkbenchArea.select('#' + d.id)
                     .attr('xlink:href', 'svgs/gateSVGS.svg#oneInputGlyph')
                 d.type = 'oneInput'
+                d.outputVal = 1
+                updateSignals(d)
                 return
             } else if (d.type == 'oneInput' && zDepressed) {
                 svgWorkbenchArea.select('#' + d.id)
                     .attr('xlink:href', 'svgs/gateSVGS.svg#zeroInputGlyph')
                 d.type = 'zeroInput'
+                d.outputVal = 0
+                updateSignals(d)
                 return
             }
 
@@ -180,14 +252,12 @@ function clearWorkbench() {
 var inputTerminalCount = 0
 
 function mDownOnCanvas() {
-    console.log('outer')
     if(ctrlDepressed || mouseDownNode) return;
-    console.log('inner')
     var point = d3.mouse(this)
     var newNode = { x: point[0],
         y: point[1],
         id: 'input_'+ inputTerminalCount,
-        inputs:'START',
+        inputs:[],
         outputVal: 1,
         outputLine: null,
         type: 'oneInput'
@@ -231,8 +301,16 @@ function keydown() {
         ctrlDepressed = true;
         node.call(force.drag);
     } else if(d3.event.keyCode === 90) {
+        //z key
         zDepressed = true;
+    } else if(d3.event.keyCode === 76) {
+        // l key
+        showConnectionLinesState()
+    } else if (d3.event.keyCode === 71) {
+        // g key
+        showGatesState()
     }
+
 
 }
 
