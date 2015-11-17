@@ -177,7 +177,7 @@ function clearWorkbench() {
 }
 
 
-var inputLineCount = 0
+var inputTerminalCount = 0
 
 function mDownOnCanvas() {
     console.log('outer')
@@ -186,13 +186,13 @@ function mDownOnCanvas() {
     var point = d3.mouse(this)
     var newNode = { x: point[0],
         y: point[1],
-        id: 'input_'+ inputLineCount,
+        id: 'input_'+ inputTerminalCount,
         inputs:'START',
         outputVal: 1,
         outputLine: null,
         type: 'oneInput'
     };
-    inputLineCount++;
+    inputTerminalCount++;
     nodes.push(newNode)
     restart()
 
@@ -217,6 +217,7 @@ function mUpOnCanvas() {
             .classed('hidden', true)
             .style('marker-end', '');
     }
+    mouseDownNode = null
 }
 
 var lastKeyDown = -1
