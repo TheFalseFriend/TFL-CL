@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TFL - Question 1</title>
+    <meta charset="utf-8">
+
+    <!-- CSS for bootstrap -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css"/>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <!-- D3 library -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+
+    <!-- driving jscript -->
+    <!--<script defer type="text/javascript" src="scripts/circuitLogic.js"></script>-->
+
+    <!-- Page style -->
+    <link rel="stylesheet" href="styles/circuitsStyle.css" type="text/css"/>
+</head>
+
+<body>
+<div class="container-fluid text-center">
+    <h1 id="titleBanner">Warmup Question - How many inputs?</h1>
+</div>
+<div class="container-fluid" id="workbenchContainer">
+    <div class="row">
+        <div class="col-md-3" id="toolbox">
+            <h3>Question 1</h3>
+            Consider the given logic function to the left. How many different combinations of inputs are there?
+            That is, how many rows would there be in the truth table associated with this logic function?
+            <br>
+            <br>
+            <br>
+            <button type="button" class="btn btn-large btn-primary btn-block" id="answer4">4<br></button>
+
+            <br>
+
+            <button type="button" class="btn btn-large btn-primary btn-block" id="answer8">8<br></button>
+
+            <br>
+
+            <button type="button" class="btn btn-large btn-primary btn-block" id="answer16">16<br></button>
+
+            <br>
+
+            <button type="button" class="btn btn-large btn-primary btn-block" id="answer3">3<br></button>
+
+            <br>
+
+            <button type="button" class="btn btn-large btn-primary btn-block" id="answer32">32<br></button>
+        </div>
+
+        <div class="col-md-9" id="buildArea">
+            <svg id="svgDrawArea">
+
+            </svg>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
